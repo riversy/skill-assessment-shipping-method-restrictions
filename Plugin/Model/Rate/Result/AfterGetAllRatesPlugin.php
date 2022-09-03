@@ -2,13 +2,10 @@
 
 namespace Riversy\ShippingMethodRestrictions\Plugin\Model\Rate\Result;
 
-use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Quote\Model\Quote\Address\RateResult\Method;
-use Magento\Shipping\Model\Carrier\CarrierInterface;
 use Magento\Shipping\Model\Rate\Result;
 use Riversy\ShippingMethodRestrictions\Model\ConfigProvider;
+use Riversy\ShippingMethodRestrictions\Model\CustomerGroupProvider;
 
 class AfterGetAllRatesPlugin
 {
@@ -18,20 +15,20 @@ class AfterGetAllRatesPlugin
     private $configProvider;
 
     /**
-     * @var CustomerSession
+     * @var CustomerGroupProvider
      */
-    private $customerSession;
+    private $customerGroupProvider;
 
     /**
      * @param ConfigProvider $configProvider
-     * @param CustomerSession $customerSession
+     * @param CustomerGroupProvider $customerGroupProvider
      */
     public function __construct(
         ConfigProvider $configProvider,
-        CustomerSession $customerSession
+        CustomerGroupProvider $customerGroupProvider
     ) {
         $this->configProvider = $configProvider;
-        $this->customerSession = $customerSession;
+        $this->customerGroupProvider = $customerGroupProvider;
     }
 
     /**
@@ -62,7 +59,7 @@ class AfterGetAllRatesPlugin
             return false;
         }
 
-        $customerGroupId = $this->getCustomerGroupId();
+        $customerGroupId = $this->customerGroupProvider->getCustomerGroupId();
         if ($customerGroupId === null) {
             return false;
         }
@@ -79,7 +76,7 @@ class AfterGetAllRatesPlugin
      *
      * @throws LocalizedException
      */
-    private function restrictShippingMethods(&$result): void
+    private function restrictShippingMethods(array &$result): void
     {
         $shippingMethodsToRestrict = $this->configProvider->getShippingMethodsToRestrict();
 
@@ -95,20 +92,5 @@ class AfterGetAllRatesPlugin
                 return !in_array($rateCode, $shippingMethodsToRestrict, true);
             }
         );
-    }
-
-    /**
-     * @return string|null
-     *
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
-     */
-    private function getCustomerGroupId(): ?string
-    {
-        if (!$this->customerSession->isLoggedIn()) {
-            return null;
-        }
-
-        return (string)$this->customerSession->getCustomerGroupId();
     }
 }

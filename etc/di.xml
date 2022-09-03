@@ -4,7 +4,7 @@
         <plugin name="Riversy_ShippingMethodRestrictions::Magento\Shipping\Model\Rate\Result::afterGetAllRates"
                 type="Riversy\ShippingMethodRestrictions\Plugin\Model\Rate\Result\AfterGetAllRatesPlugin" />
     </type>
-    <type name="Riversy\ShippingMethodRestrictions\Plugin\Model\Rate\Result\AfterGetAllRatesPlugin">
+    <type name="Riversy\ShippingMethodRestrictions\Model\CustomerGroupProvider">
         <arguments>
             <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
